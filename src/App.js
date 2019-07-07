@@ -18,7 +18,7 @@ import Notifications from "./components/Notifications";
 import SessionStore from "./stores/SessionStore";
 
 // map of house
-import Map from "./views/house/Map";
+import HouseMap from "./views/house/Map";
 
 // About me
 import About from "./views/house/About";
@@ -121,7 +121,7 @@ class App extends Component {
               <div className={classNames(this.props.classes.main, this.state.drawerOpen && this.props.classes.mainDrawerOpen)}>
                 <Grid container spacing={24}>
                   <Switch>
-                    <Route exact path="/" component={Map} />
+                    <Route exact path="/" component={HouseMap} />
                     <Route exact path="/about" component={About} />
                   </Switch>
                 </Grid>
