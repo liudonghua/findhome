@@ -1,4 +1,7 @@
 import intl from 'react-intl-universal';
+import _ from "lodash";
+import http from "axios";
+
 import React, { Component } from "react";
 import {Router} from "react-router-dom";
 import { Route, Switch } from 'react-router-dom';
@@ -6,7 +9,6 @@ import classNames from "classnames";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { MuiThemeProvider, withStyles } from "@material-ui/core/styles";
-import Grid from '@material-ui/core/Grid';
 
 import history from "./history";
 import theme from "./theme";
@@ -14,14 +16,11 @@ import theme from "./theme";
 import TopNav from "./components/TopNav";
 import SideNav from "./components/SideNav";
 import Footer from "./components/Footer";
-import Notifications from "./components/Notifications";
-import SessionStore from "./stores/SessionStore";
-
 // map of house
 import HouseMap from "./views/house/Map";
 
 // About me
-import About from "./views/house/About";
+//import About from "./views/house/About";
 
 //import Pro from "./views/house/Pro";
 
@@ -65,7 +64,7 @@ const SUPPOER_LOCALES = [
   }
 ];
 
-class App extends Component {
+class App extends Component {  
   constructor(props) {
     super(props);
 
@@ -74,42 +73,43 @@ class App extends Component {
       user: null,
       drawerOpen: false,
     };
-
     this.setDrawerOpen = this.setDrawerOpen.bind(this);
-    this.onSelectLocale = this.onSelectLocale.bind(this);
-  }
+}
 
-  componentDidMount() {
-    SessionStore.on("change", () => {
-      this.setState({
-        user: SessionStore.getUser(),
-        drawerOpen: SessionStore.getUser() != null,
-      });
-    });
-
+  componentDidMount() {    
     this.setState({
-      user: SessionStore.getUser(),
-      drawerOpen: SessionStore.getUser() != null,
-    });
-  }
+   
+    drawerOpen: false
+  });
+  this.loadLocales();
+}
 
-  setDrawerOpen(state) {
-    this.setState({
-      drawerOpen: state,
-    });
+setDrawerOpen(state) {
+  this.setState({
+    drawerOpen: state,
+  });
+    
 
-    this.loadLocales();
   }
 
   render() {
     let topNav = null;
     let sideNav = null;
 
-    if (this.state.user !== null) {
-      topNav = <TopNav setDrawerOpen={this.setDrawerOpen} drawerOpen={this.state.drawerOpen} user={this.state.user} />;
-      sideNav = <SideNav open={this.state.drawerOpen} user={this.state.user} />
-    }
+  
+    
 
+    topNav = <TopNav setDrawerOpen={this.setDrawerOpen} drawerOpen={this.state.drawerOpen} user={this.state.user} />;
+      
+    sideNav = <SideNav open={this.state.drawerOpen} user={this.state.user} />
+      
+
+    // const theme = createMuiTheme({
+    //   typography: {
+    //     useNextVariants: true,
+
+    //  }
+    // });
     return (
       <Router history={history}>
         <React.Fragment>
@@ -119,18 +119,14 @@ class App extends Component {
               {topNav}
               {sideNav}
               <div className={classNames(this.props.classes.main, this.state.drawerOpen && this.props.classes.mainDrawerOpen)}>
-                <Grid container spacing={24}>
                   <Switch>
                     <Route exact path="/" component={HouseMap} />
-                    <Route exact path="/about" component={About} />
                   </Switch>
-                </Grid>
               </div>
               <div className={this.state.drawerOpen ? this.props.classes.footerDrawerOpen : ""}>
                 <Footer />
               </div>
-            </div>
-            <Notifications />
+            </div>           
           </MuiThemeProvider>
         </React.Fragment>
       </Router>

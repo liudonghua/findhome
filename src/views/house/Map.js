@@ -1,3 +1,4 @@
+// noprotect
 import React, { Component } from "react";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -7,55 +8,49 @@ import {Map, MarkerList, NavigationControl,MapTypeControl,ScaleControl,OverviewM
 import LocationStore from "../../stores/LocationStore";
 import HouseStore from "../../stores/HouseStore";
 
-
+const styles = {
+  height: "90vh",
+  width: "100hh",
+  padding:  0,
+  margin: 0,
+};
 
 class HouseMap extends Component {
+  _isMounted = false;
+
   constructor() {
     super();
-    
+    this.map=null;
     this.state = {
       mapZoom: 15,
+      center: {},
+      houses: []
     };
     this.setCurrentPosition = this.setCurrentPosition.bind(this);
-    this.updatePosition = this.updatePosition.bind(this);
-    this.updateZoom = this.updateZoom.bind(this);
+    this.getHouses = this.getHouses.bind(this);
   }
 
   componentDidMount() {
-    super.componentDidMount();
-
-    if (!this.props.update) {
-      this.setCurrentPosition();
-      this.getHouses();
-    }
+    this._isMounted = true;
+    this.setCurrentPosition();
+  }
+  
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
-  setCurrentPosition(e) {
-    if (e !== undefined) {
-      e.preventDefault();
-    }
-
+  setCurrentPosition() {
     LocationStore.getLocation(position => {
       let center = this.state.center;
-      center.location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
+      center = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
       }
-      this.setState({
-        center: center,
-      });
-    });
-  }
-
-  updatePosition() {
-    const position = this.refs.marker.leafletElement.getLatLng();
-    let center = this.state.center;
-    center.location = {
-      lat: position.lat,
-      lng: position.lng,
-    }
-    this.setState({
-      center: center,
+      if (this._isMounted) {
+        this.setState({
+          center: center,
+        });
+      }
     });
   }
 
@@ -63,26 +58,42 @@ class HouseMap extends Component {
     return {
         tilesloaded: (e) => {
             console.log('tilesloaded', e.type);
+            this.map = e.target;
             this.getHouses();
+        },
+        load: (e) => {
+          this.map = e.target;
+          
+          this.getHouses();
         }
+
     }
   }
 
   getHouses(){
+    if(this.map === undefined || this.map===null){
+      return;
+    }
     let bound   = this.map.getBounds();
     let csw     = bound.getSouthWest();
     let cne     = bound.getNorthEast();
+    let zone    = {
+      east:   cne.lng,
+      west:   csw.lng,
+      south:  csw.lat,
+      north:  cne.lat
+    };
     let houses  = this.state.houses;
-    HouseStore.getHouses(cne.lng,csw.lng,csw.lat,cne.lat, resp => {
-        let house   = {};
-        for (const row of resp.result) {
-            house={
-                location : row.longitude + ',' + row.latitude,
-                text     : row.price
-            };
-            houses.push(house);
-        }
-    });
+    let house   = {};
+    let resp = HouseStore.getHouses(zone);
+    if(resp ===undefined || resp.length ===undefined || resp.length===0) return;
+    for (const row of resp) {
+        house={
+            location : row.longitude + ',' + row.latitude,
+            text     : row.price
+        };
+        houses.push(house);
+    }
     this.setState({
         houses : houses
     });
@@ -93,9 +104,9 @@ class HouseMap extends Component {
       return(<div></div>);
     }
     return(
-          <Map center={this.state.center.location}
+          <Map center={this.state.center}
                 zoom={this.state.mapZoom}
-                ref={ref => {this.map = ref.map}}
+                style={styles}
                 events={this.getEvents()}
                 enableScrollWheelZoom={true}  
             >
@@ -116,4 +127,4 @@ class HouseMap extends Component {
   }
 }
 
-export default withStyles(styles)(Map);
+export default withStyles(styles)(HouseMap);

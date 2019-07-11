@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 
-import SessionStore from "../stores/SessionStore";
+
 import theme from "../theme";
 
 const styles = {
@@ -25,13 +25,7 @@ class Footer extends Component {
   }
 
   componentDidMount() {
-    SessionStore.getBranding(resp => {
-      if (resp.footer !== "") {
-        this.setState({
-          footer: resp.footer,
-        });
-      }
-    });
+
   }
 
   render() {

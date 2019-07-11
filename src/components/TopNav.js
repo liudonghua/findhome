@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import intl from 'react-intl-universal';
 
 import AppBar from "@material-ui/core/AppBar";
@@ -11,16 +11,13 @@ import Menu from '@material-ui/core/Menu';
 import Input from "@material-ui/core/Input";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import blue from "@material-ui/core/colors/blue";
-import Avatar from '@material-ui/core/Avatar';
-import Chip from '@material-ui/core/Chip';
 
 import MenuIcon from "mdi-material-ui/Menu";
 import Backburger from "mdi-material-ui/Backburger";
-import AccountCircle from "mdi-material-ui/AccountCircle";
+
 import Magnify from "mdi-material-ui/Magnify";
 import HelpCicle from "mdi-material-ui/HelpCircle";
-
-import SessionStore from "../stores/SessionStore";
+ 
 import theme from "../theme";
 
 
@@ -101,9 +98,7 @@ class TopNav extends Component {
   }
 
   onLogout() {
-    SessionStore.logout(() => {
-      this.props.history.push("/login");
-    });
+
   }
 
   handleDrawerToggle() {
@@ -144,12 +139,12 @@ class TopNav extends Component {
           </IconButton>
 
           <div className={this.props.classes.flex}>
-            <img src="/logo/logo.png" className={this.props.classes.logo} alt="{intl.get('SITETITLE')}" />
+            <img src="/logo/logo.png" className={this.props.classes.logo} alt={intl.get('SITETITLE')} />
           </div>
 
           <form onSubmit={this.onSearchSubmit}>
             <Input
-              placeholder="{intl.get('SEARCHADDR')}"
+              placeholder={intl.get('SEARCHADDR')}
               className={this.props.classes.search}
               disableUnderline={true}
               value={this.state.search || ""}
@@ -168,20 +163,7 @@ class TopNav extends Component {
             </IconButton>
           </a>
 
-          <Chip
-            avatar={
-              <Avatar>
-                <AccountCircle />
-              </Avatar>
-            }
-            label={this.props.user.username}
-            onClick={this.onMenuOpen}
-            classes={{
-              avatar: this.props.classes.avatar,
-              root: this.props.classes.chip,
-            }}
-          />
-          <Menu
+         <Menu
             id="menu-appbar"
             anchorEl={this.state.menuAnchor}
             anchorOrigin={{
@@ -195,7 +177,6 @@ class TopNav extends Component {
             open={open}
             onClose={this.onMenuClose}
           >
-            <MenuItem component={Link} to={`/users/${this.props.user.id}/password`}>{intl.get('PASSWORD')}</MenuItem>
             <MenuItem onClick={this.onLogout}>{intl.get('LOGOUT')}</MenuItem>
           </Menu>
         </Toolbar>
