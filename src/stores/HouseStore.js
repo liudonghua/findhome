@@ -1,4 +1,6 @@
-class HouseStore{
+import { EventEmitter } from "events";
+import "whatwg-fetch";
+class HouseStore extends EventEmitter{
 
 
   getHouses(zone){
@@ -8,24 +10,20 @@ class HouseStore{
       formData.append(name, zone[name]);
     }
 
-    fetch('http://127.0.0.1:8000/getRange/',
-      {
-        method: 'post',
-        headers: {},
-        mode:   'no-cors',
-        body:    formData //JSON.stringify(zone)
-      }
-    )
-    .then(response => response.json())
+    fetch("http://127.0.0.1:8000/getRange/",{
+      method: "post",
+      mode:   "no-cors",
+      body:    formData
+    })
+    .then((res) => {console.log(res);return res.json();})
     .then((jsonData) => {
       console.log(jsonData);
       return jsonData;
     })
     .catch((error) => {
-      // handle your errors here
       console.error(error);
       return [];
-    })
+    });
     
   }
 

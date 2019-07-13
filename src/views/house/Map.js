@@ -1,12 +1,11 @@
 // noprotect
 import React, { Component } from "react";
-
+import intl from 'react-intl-universal';
 import { withStyles } from "@material-ui/core/styles";
 
-import {Map, MarkerList, NavigationControl,MapTypeControl,ScaleControl,OverviewMapControl} from 'react-bmap';
+import {Map, MarkerList, MapTypeControl,ScaleControl,NavigationControl } from 'react-bmap';
 
 import LocationStore from "../../stores/LocationStore";
-import HouseStore from "../../stores/HouseStore";
 
 const styles = {
   height: "90vh",
@@ -22,7 +21,6 @@ class HouseMap extends Component {
     super();
     this.map=null;
     this.state = {
-      mapZoom: 15,
       center: {},
       houses: []
     };
@@ -58,7 +56,7 @@ class HouseMap extends Component {
     return {
         tilesloaded: (e) => {
             console.log('tilesloaded', e.type);
-            this.map = e.target;
+           // this.map = e.target;
             this.getHouses();
         },
         load: (e) => {
@@ -83,46 +81,81 @@ class HouseMap extends Component {
       south:  csw.lat,
       north:  cne.lat
     };
-    let houses  = this.state.houses;
-    let house   = {};
-    let resp = HouseStore.getHouses(zone);
-    if(resp ===undefined || resp.length ===undefined || resp.length===0) return;
-    for (const row of resp) {
-        house={
-            location : row.longitude + ',' + row.latitude,
-            text     : row.price
-        };
-        houses.push(house);
+
+    var formData  = new FormData();
+
+    for(var name in zone) {
+      formData.append(name, zone[name]);
     }
-    this.setState({
-        houses : houses
+
+    fetch("http://127.0.0.1:8000/getRange/",{
+      method: "post",
+      body:    formData
+    })
+    .then((res) => {console.log(res);return res.json();})
+    .then((jsonData) => {
+      console.log(jsonData);
+     
+      let houses  = [];
+      let house   = {};
+      for (const row of jsonData.data) {
+          house={
+              location : row.lng + ',' + row.lat,
+              text     : row.price+'',
+              url      : row.url
+          };
+          houses.push(house);
+      }
+      console.log(houses);
+      this.setState({
+          houses : houses
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      this.setState({
+        houses : []
+      });
     });
+
+
   }
 
   render() {
     if (this.state.center === undefined) {
       return(<div></div>);
     }
+    let default_pageFet=`menubar=no,
+    resziable=no,
+    scrollbars=yes,
+    status=no
+    `;
     return(
+        <div>
           <Map center={this.state.center}
-                zoom={this.state.mapZoom}
+                zoom='15'
                 style={styles}
                 events={this.getEvents()}
                 enableScrollWheelZoom={true}  
             >
-            <MarkerList 
-                data={this.state.houses} 
-                    fillStyle="#ff3333" 
-                    animation={true} 
-                    isShowShadow={false} 
-                    multiple={true} 
-                    autoViewport={true}
-            />
-            <NavigationControl /> 
+            <MarkerList
+             data={this.state.houses}
+             fillStyle="#ff3333" 
+             animation={false} 
+              isShowNumber={false} 
+              mini={false}
+              textAlign="center" 
+              
+              autoViewport={false}
+              onclick={(item)=>{ 
+                
+            }} />
+            <NavigationControl />
             <MapTypeControl />
             <ScaleControl />
-            <OverviewMapControl />
+            
           </Map>
+        </div>  
     );
   }
 }
