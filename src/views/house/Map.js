@@ -16,15 +16,16 @@ const styles = {
 };
 
 class HouseMap extends Component {
+  isClose = true;
+
+
   constructor() {
     super();
     this.state = {
       center: {},
       houses: [],
       info:   {},
-      isClose: true,
-      isTile: false,
-      isClick: false
+
     };
     this.setCurrentPosition = this.setCurrentPosition.bind(this);
     this.getHouses = this.getHouses.bind(this);
@@ -58,12 +59,10 @@ class HouseMap extends Component {
     return {
         tilesloaded: (e) => {
           this.getHouses();
-            
-          
           
           this.setState({
             center: e.target.getCenter(),
-            isTile: true
+            
           });
           
 
@@ -79,13 +78,12 @@ class HouseMap extends Component {
   getInfoEvents(){
     return {
       close: (e) =>{
-       this.setState({
-          isClose: true
-       });
-        
+         
       },
       clickclose: (e) =>{
         
+        this.isClose = true;
+        //e.target.destory();
       }
     }
   }
@@ -152,11 +150,12 @@ class HouseMap extends Component {
     if (this.state.center.lat === undefined || this.state.center.lng === undefined) {
       return(<div></div>);
     }
-    this.infoWindow = null;
-    if((this.state.isClose===false && this.state.isTile===true)|| this.state.isClick===true){
+    var infoWindow = null;
+    console.log("render");
+    if(this.isClose===false){
       let text  = "<div><div><a href=\""+this.state.info.url+"\" ><img  alt=\""+this.state.info.text+"\" src=\""+this.state.info.img+"\" /></a></div><div>"+this.state.info.detail+"</div></div>"
 
-      this.infoWindow=<InfoWindow position={{lng:this.state.info.lng,lat:this.state.info.lat}}
+      infoWindow=<InfoWindow position={{lng:this.state.info.lng,lat:this.state.info.lat}}
         text={text}
         enableAutoPan={false}
         events={this.getInfoEvents()}
@@ -179,11 +178,9 @@ class HouseMap extends Component {
                         if(this._isMounted){
                           let houseinfo = this.state.houses[item];
                           this.isClose = false;
-                          
-
                           this.setState({
                             info: houseinfo,
-                            isClick: true,
+                            
                             center: {
                               lng:  houseinfo.lng,
                               lat:  houseinfo.lat
@@ -200,7 +197,7 @@ class HouseMap extends Component {
                         
               />
           
-            {this.infoWindow}
+            {infoWindow}
             <NavigationControl />
             <MapTypeControl />
             <ScaleControl />
