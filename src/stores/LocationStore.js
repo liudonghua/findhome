@@ -15,7 +15,8 @@ class LocationStore extends EventEmitter {
   }
   
   getGeoIPLocation(callbackFunc) {
-   callbackFunc({coords: {latitude: 39.92, longitude: 116.46}});
+   //callbackFunc({coords: {latitude: 39.92, longitude: 116.46}});
+    callbackFunc({coords: {latitude: 22.6, longitude: 113.9 }});
   }
 }
 

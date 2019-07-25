@@ -1,12 +1,13 @@
 // noprotect
 import React, { Component } from "react";
-import intl from 'react-intl-universal';
+//import intl from 'react-intl-universal';
 import { withStyles } from "@material-ui/core/styles";
 
-import {Map, MarkerList, MapTypeControl,ScaleControl,NavigationControl } from 'react-bmap';
+import {Map, MarkerList,InfoWindow, MapTypeControl,ScaleControl,NavigationControl } from 'react-bmap';
 
 import LocationStore from "../../stores/LocationStore";
 
+//full screen map style
 const styles = {
   height: "90vh",
   width: "100hh",
@@ -15,14 +16,15 @@ const styles = {
 };
 
 class HouseMap extends Component {
-  _isMounted = false;
-
   constructor() {
     super();
-    this.map=null;
     this.state = {
       center: {},
-      houses: []
+      houses: [],
+      info:   {},
+      isClose: true,
+      isTile: false,
+      isClick: false
     };
     this.setCurrentPosition = this.setCurrentPosition.bind(this);
     this.getHouses = this.getHouses.bind(this);
@@ -39,7 +41,7 @@ class HouseMap extends Component {
 
   setCurrentPosition() {
     LocationStore.getLocation(position => {
-      let center = this.state.center;
+       let center = this.state.center;
       center = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
@@ -55,16 +57,36 @@ class HouseMap extends Component {
   getEvents() {
     return {
         tilesloaded: (e) => {
-            console.log('tilesloaded', e.type);
-           // this.map = e.target;
-            this.getHouses();
+          this.getHouses();
+            
+          
+          
+          this.setState({
+            center: e.target.getCenter(),
+            isTile: true
+          });
+          
+
         },
         load: (e) => {
           this.map = e.target;
-          
           this.getHouses();
         }
 
+    };
+  }
+
+  getInfoEvents(){
+    return {
+      close: (e) =>{
+       this.setState({
+          isClose: true
+       });
+        
+      },
+      clickclose: (e) =>{
+        
+      }
     }
   }
 
@@ -92,44 +114,57 @@ class HouseMap extends Component {
       method: "post",
       body:    formData
     })
-    .then((res) => {console.log(res);return res.json();})
-    .then((jsonData) => {
-      console.log(jsonData);
-     
+    .then((res) => {return res.json();})
+    .then((jsonData) => {     
       let houses  = [];
       let house   = {};
       for (const row of jsonData.data) {
           house={
-              location : row.lng + ',' + row.lat,
-              text     : row.price+'',
-              url      : row.url
-          };
+              location  : row.lng + ',' + row.lat,
+              lng       : row.lng,
+              lat       : row.lat,
+              text      : '￥'+row.price,
+              img       : row.img,
+              detail    : row.detail,
+              url       : row.url
+          }; 
           houses.push(house);
       }
-      console.log(houses);
-      this.setState({
+      if(this._isMounted)
+        this.setState({
           houses : houses
-      });
+        });
     })
     .catch((error) => {
       console.error(error);
-      this.setState({
+      if(this._isMounted)
+      {
+        this.setState({
         houses : []
-      });
+        });
+      }
     });
 
 
   }
 
   render() {
-    if (this.state.center === undefined) {
+    if (this.state.center.lat === undefined || this.state.center.lng === undefined) {
       return(<div></div>);
     }
-    let default_pageFet=`menubar=no,
-    resziable=no,
-    scrollbars=yes,
-    status=no
-    `;
+    this.infoWindow = null;
+    if((this.state.isClose===false && this.state.isTile===true)|| this.state.isClick===true){
+      let text  = "<div><div><a href=\""+this.state.info.url+"\" ><img  alt=\""+this.state.info.text+"\" src=\""+this.state.info.img+"\" /></a></div><div>"+this.state.info.detail+"</div></div>"
+
+      this.infoWindow=<InfoWindow position={{lng:this.state.info.lng,lat:this.state.info.lat}}
+        text={text}
+        enableAutoPan={false}
+        events={this.getInfoEvents()}
+        title={this.state.info.text}
+       />;
+
+    }
+
     return(
         <div>
           <Map center={this.state.center}
@@ -139,17 +174,33 @@ class HouseMap extends Component {
                 enableScrollWheelZoom={true}  
             >
             <MarkerList
-             data={this.state.houses}
-             fillStyle="#ff3333" 
-             animation={false} 
-              isShowNumber={false} 
-              mini={false}
-              textAlign="center" 
-              
-              autoViewport={false}
-              onclick={(item)=>{ 
-                
-            }} />
+                      data={this.state.houses}
+                      onClick={(item)=>{ 
+                        if(this._isMounted){
+                          let houseinfo = this.state.houses[item];
+                          this.isClose = false;
+                          
+
+                          this.setState({
+                            info: houseinfo,
+                            isClick: true,
+                            center: {
+                              lng:  houseinfo.lng,
+                              lat:  houseinfo.lat
+                            },
+                          });
+                        }
+                       }}
+                      fillStyle="#ff3333" 
+                      animation={false} 
+                      isShowNumber={false} 
+                      mini={false}
+                      textAlign="center" 
+                      autoViewport={false}
+                        
+              />
+          
+            {this.infoWindow}
             <NavigationControl />
             <MapTypeControl />
             <ScaleControl />

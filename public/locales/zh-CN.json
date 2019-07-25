@@ -4,5 +4,8 @@
     "LOGOUT":           "注销",
     "STAT":             "统计",
     "ABOUT":            "关于我们",
-    "SITETITLE":        "房宝图"
+    "SITETITLE":        "房宝图",
+    "DETAIL":           "detail",
+    "GUIDETITILE":      "guide title",
+    "GUIDECONTENT":     "guide content"       
 }
