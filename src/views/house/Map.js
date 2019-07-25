@@ -83,7 +83,7 @@ class HouseMap extends Component {
       clickclose: (e) =>{
         
         this.isClose = true;
-        //e.target.destory();
+        
       }
     }
   }
@@ -151,7 +151,7 @@ class HouseMap extends Component {
       return(<div></div>);
     }
     var infoWindow = null;
-    console.log("render");
+  
     if(this.isClose===false){
       let text  = "<div><div><a href=\""+this.state.info.url+"\" ><img  alt=\""+this.state.info.text+"\" src=\""+this.state.info.img+"\" /></a></div><div>"+this.state.info.detail+"</div></div>"
 
