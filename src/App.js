@@ -12,6 +12,7 @@ import { MuiThemeProvider, withStyles } from "@material-ui/core/styles";
 
 import history from "./history";
 import theme from "./theme";
+import 'typeface-roboto';
 
 import TopNav from "./components/TopNav";
 import SideNav from "./components/SideNav";
@@ -104,18 +105,14 @@ setDrawerOpen(state) {
     sideNav = <SideNav open={this.state.drawerOpen} user={this.state.user} />
       
 
-    // const theme = createMuiTheme({
-    //   typography: {
-    //     useNextVariants: true,
-
-    //  }
-    // });
     return (
+      
       <Router history={history}>
         <React.Fragment>
           <CssBaseline />
           <MuiThemeProvider theme={theme}>
             <div className={this.props.classes.root}>
+              
               {topNav}
               {sideNav}
               <div className={classNames(this.props.classes.main, this.state.drawerOpen && this.props.classes.mainDrawerOpen)}>
@@ -146,7 +143,7 @@ setDrawerOpen(state) {
     http
       .get(`locales/${currentLocale}.json`)
       .then(res => {
-        console.log("App locale data", res.data);
+        //console.log("App locale data", res.data);
         // init method will load CLDR locale data according to currentLocale
         return intl.init({
           currentLocale,

@@ -1,6 +1,7 @@
 // noprotect
 import React, { Component } from "react";
-//import intl from 'react-intl-universal';
+
+import intl from 'react-intl-universal';
 import { withStyles } from "@material-ui/core/styles";
 
 import {Map, MarkerList,InfoWindow, MapTypeControl,ScaleControl,NavigationControl } from 'react-bmap';
@@ -9,10 +10,26 @@ import LocationStore from "../../stores/LocationStore";
 
 //full screen map style
 const styles = {
-  height: "90vh",
-  width: "100hh",
-  padding:  0,
-  margin: 0,
+  root: {
+    flexGrow: 1,
+    display: "flex",
+    Height: "100vh",
+    flexDirection: "column",
+  },
+  map:{
+    height: "100%",
+    width: "100%",
+  },
+  load:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  img:{
+    height: '100%',
+    width: '100%'
+  }
+ 
 };
 
 class HouseMap extends Component {
@@ -27,17 +44,17 @@ class HouseMap extends Component {
       info:   {},
 
     };
-    this.setCurrentPosition = this.setCurrentPosition.bind(this);
-    this.getHouses = this.getHouses.bind(this);
   }
 
   componentDidMount() {
     this._isMounted = true;
+    
     this.setCurrentPosition();
   }
   
   componentWillUnmount() {
     this._isMounted = false;
+    document.title = intl.get('SITETITLE');
   }
 
   setCurrentPosition() {
@@ -99,7 +116,8 @@ class HouseMap extends Component {
       east:   cne.lng,
       west:   csw.lng,
       south:  csw.lat,
-      north:  cne.lat
+      north:  cne.lat,
+      price:  this.state.info.text===undefined ?  '':''+this.state.info.text.substring(1)
     };
 
     var formData  = new FormData();
@@ -148,27 +166,28 @@ class HouseMap extends Component {
 
   render() {
     if (this.state.center.lat === undefined || this.state.center.lng === undefined) {
-      return(<div></div>);
+      return(<div className={this.props.classes.root}><div className={this.props.classes.load}><img className={this.props.classes.img} src="/load.gif" alt="loading" /></div></div>);
     }
     var infoWindow = null;
-  
+
     if(this.isClose===false){
       let text  = "<div><div><a href=\""+this.state.info.url+"\" ><img  alt=\""+this.state.info.text+"\" src=\""+this.state.info.img+"\" /></a></div><div>"+this.state.info.detail+"</div></div>"
 
       infoWindow=<InfoWindow position={{lng:this.state.info.lng,lat:this.state.info.lat}}
         text={text}
         enableAutoPan={false}
+        enableCloseOnClick={false}
         events={this.getInfoEvents()}
         title={this.state.info.text}
-       />;
+        />;
 
     }
-
+    
     return(
-        <div>
+        <div className={this.props.classes.root}>
           <Map center={this.state.center}
                 zoom='15'
-                style={styles}
+                className={this.props.classes.map}
                 events={this.getEvents()}
                 enableScrollWheelZoom={true}  
             >
@@ -187,7 +206,7 @@ class HouseMap extends Component {
                             },
                           });
                         }
-                       }}
+                        }}
                       fillStyle="#ff3333" 
                       animation={false} 
                       isShowNumber={false} 
@@ -205,6 +224,8 @@ class HouseMap extends Component {
           </Map>
         </div>  
     );
+
+
   }
 }
 

@@ -8,7 +8,7 @@ class LocationStore extends EventEmitter {
         callbackFunc(position);
       }, (error) => {
         this.getGeoIPLocation(callbackFunc);
-      });
+      },{enableHighAccuracy: true, timeout: 5000});
     } else {
       this.getGeoIPLocation(callbackFunc);
     }

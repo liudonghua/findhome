@@ -6,6 +6,10 @@ const theme = createMuiTheme({
     palette: {
       primary: blue,
     },
+    typography: {
+      useNextVariants: true,
+
+   }
 });
   
 export default theme;

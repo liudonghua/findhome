@@ -8,14 +8,12 @@ import { withStyles } from "@material-ui/core/styles";
 import { IconButton } from "@material-ui/core";
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import Input from "@material-ui/core/Input";
-import InputAdornment from "@material-ui/core/InputAdornment";
+
 import blue from "@material-ui/core/colors/blue";
 
 import MenuIcon from "mdi-material-ui/Menu";
 import Backburger from "mdi-material-ui/Backburger";
 
-import Magnify from "mdi-material-ui/Magnify";
 import HelpCicle from "mdi-material-ui/HelpCircle";
  
 import theme from "../theme";
@@ -74,15 +72,12 @@ class TopNav extends Component {
 
     this.state = {
       menuAnchor: null,
-      search: "",
     };
 
     this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
     this.onMenuOpen = this.onMenuOpen.bind(this);
     this.onMenuClose = this.onMenuClose.bind(this);
     this.onLogout = this.onLogout.bind(this);
-    this.onSearchChange = this.onSearchChange.bind(this);
-    this.onSearchSubmit = this.onSearchSubmit.bind(this);
   }
 
   onMenuOpen(e) {
@@ -103,17 +98,6 @@ class TopNav extends Component {
 
   handleDrawerToggle() {
     this.props.setDrawerOpen(!this.props.drawerOpen);
-  }
-
-  onSearchChange(e) {
-    this.setState({
-      search: e.target.value,
-    });
-  }
-
-  onSearchSubmit(e) {
-    e.preventDefault();
-    this.props.history.push(`/search?search=${encodeURIComponent(this.state.search)}`);
   }
 
   render() {
@@ -141,21 +125,6 @@ class TopNav extends Component {
           <div className={this.props.classes.flex}>
             <img src="/logo/logo.png" className={this.props.classes.logo} alt={intl.get('SITETITLE')} />
           </div>
-
-          <form onSubmit={this.onSearchSubmit}>
-            <Input
-              placeholder={intl.get('SEARCHADDR')}
-              className={this.props.classes.search}
-              disableUnderline={true}
-              value={this.state.search || ""}
-              onChange={this.onSearchChange}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Magnify />
-                </InputAdornment>
-              }
-            />
-          </form>
 
           <a href="https://house.com" target="house-about">
             <IconButton className={this.props.classes.iconButton}>
